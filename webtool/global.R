@@ -67,3 +67,11 @@ dim_reds <- c("PCA", "tSNE", "ClassicalMDS", "KruskalMDS", "SammonMDS", "UMAP")
 boolean <- c(FALSE, TRUE)
 clusters <- c("average", "ward.D", "ward.D2", "single", "complete", "mcquitty", "median", "centroid")
 cors <- c("pearson", "spearman")
+
+# Custom colour palette
+
+custom_palette <- c("#D87CAC", # Thulian pink
+                    "#E5E6E4", # Platinum
+                    "#084C61", # Midnight green
+                    "#C03221", # Engineering orange
+                    "#773344") # Wine
