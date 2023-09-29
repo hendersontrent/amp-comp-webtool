@@ -68,7 +68,7 @@ boolean <- c(FALSE, TRUE)
 clusters <- c("average", "ward.D", "ward.D2", "single", "complete", "mcquitty", "median", "centroid")
 cors <- c("pearson", "spearman")
 
-# Custom colour palette
+# Custom colour palette (https://coolors.co/d87cac-e5e6e4-084c61-c03221-773344)
 
 custom_palette <- c("#D87CAC", # Thulian pink
                     "#E5E6E4", # Platinum
