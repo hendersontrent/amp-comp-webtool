@@ -1,0 +1,21 @@
+# Guitar Plugin Amplifier Comparison Tool
+***
+
+## What is this application?
+
+This application is an interactive tool designed to facilitate easy engagement with recent novel analysis of guitar virtual studio technology (VST) plugin signals.
+
+## How was the analysis conducted?
+
+Traditional analysis of auditory signals has not typically considered time-series features. Time-series features are properties that reduce an ordered vector of data (i.e., a time series) down to a single summary statistic. Simple examples of features include the value of the [autocorrelation function](https://en.wikipedia.org/wiki/Autocorrelation) at lag 1, the coefficient of the linear trend, and the longest period of consecutive values above the mean. [Previous work](https://github.com/benfulcher/hctsa) encoded >7000 time-series features into a comprehensive toolbox, while even more [recent work](https://github.com/hendersontrent/theft) brought a substantial number of these to the free and open-source setting. Time-series features have since been used to answer a 
+
+With regards to guitar VSTs, the following procedure was implemented (a paper is in development which outlines the methodology much more rigorously):
+
+* Set all dials to noon, disable all effects, cabinets, and microphones to isolate the head
+* Pass a 20Hz-20kHz sine sweep through the amplifier to generate an emplitude waveform over time (a time series)
+* Calculate time-series features for each amplifier
+* Conduct statistical analysis of feature results
+
+## Who made it?
+
+This application was developed by [Trent Henderson](https://twitter.com/trentlikesstats) -- a passionate guitarist, Senior Data Scientist for an industry firm (in a field unrelated to music technology), and PhD student in the [Dynamics and Neural Systems Group](https://dynamicsandneuralsystems.github.io) in the School of Physics at The University of Sydney. Please send any questions to Trent via [email](then6675@uni.sydney.edu.au). If you identify an issue with the application itself, or want to contribute, please log an issue or pull request at the [GitHub repository](https://github.com/hendersontrent/amp-comp-webtool/issues). Please also see the [original repository](https://github.com/hendersontrent/amp-sim-comp) for the analytical work which underpins this application.
