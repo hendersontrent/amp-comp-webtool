@@ -138,9 +138,9 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     
     p <- cluster_out %>%
       ggplot2::ggplot(ggplot2::aes(x = .data$names, y = .data$id, fill = .data$value,
-                                   text = paste('<b>VST:</b>', amplifier,
+                                   text = paste('<b>VST:</b>', id,
                                                 '<br><b>Feature:</b>', names,
-                                                '<br><b>Value:</b>', round(values, digits = 2))))  +
+                                                '<br><b>Value:</b>', round(value, digits = 2))))  +
       ggplot2::geom_raster(...) +
       ggplot2::scale_fill_stepsn(n.breaks = 6, colours = rev(mypalette),
                                  show.limits = TRUE) +

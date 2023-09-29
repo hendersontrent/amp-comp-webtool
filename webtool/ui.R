@@ -24,6 +24,8 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                                              choices = boolean, selected = boolean[1], inline = TRUE),
                                 radioButtons("low_dim_method", "What dimensionality reduction method would you like to use?",
                                              choices = dim_reds, selected = dim_reds[1], inline = FALSE),
+                                pickerInput("low_dim_amps", "What VSTs do you want to include in the analysis?", choices = amplifiers, 
+                                            selected = amplifiers, options = list(`actions-box` = TRUE), multiple = TRUE),
                                 
                                 conditionalPanel(
                                   condition = "input.low_dim_norm == 'tSNE'",
@@ -52,6 +54,8 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                                              choices = boolean, selected = boolean[1], inline = TRUE),
                                 radioButtons("data_matrix_cluster", "What clustering method would you like to use to organise the matrix?",
                                              choices = clusters, selected = clusters[1], inline = FALSE),
+                                pickerInput("data_matrix_amps", "What VSTs do you want to include in the analysis?", choices = amplifiers, 
+                                            selected = amplifiers, options = list(`actions-box` = TRUE), multiple = TRUE),
                               ),
                               
                               mainPanel(
@@ -76,6 +80,8 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                                              choices = clusters, selected = clusters[1], inline = FALSE),
                                 radioButtons("pw_corrs_cor", "What correlation method would you like to use?",
                                              choices = cors, selected = cors[1], inline = TRUE),
+                                pickerInput("pw_corrs_amps", "What VSTs do you want to include in the analysis?", choices = amplifiers, 
+                                            selected = amplifiers, options = list(`actions-box` = TRUE), multiple = TRUE),
                               ),
                               
                               mainPanel(
