@@ -274,7 +274,8 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
   # Convert to interactive graphic
   
   p <- plotly::ggplotly(p, tooltip = c("text")) %>%
-    config(displayModeBar = FALSE)
+    config(displayModeBar = FALSE) %>%
+    layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
   
   return(p)
 }
@@ -475,7 +476,8 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
   }
   
   p <- plotly::ggplotly(p, tooltip = c("text")) %>%
-    config(displayModeBar = FALSE)
+    config(displayModeBar = FALSE) %>%
+    layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
   
   return(p)
 }
