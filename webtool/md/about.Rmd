@@ -7,15 +7,25 @@ This application is an interactive tool designed to facilitate easy engagement w
 
 ## How was the analysis conducted?
 
-Traditional analysis of auditory signals has not typically considered time-series features. Time-series features are properties that reduce an ordered vector of data (i.e., a time series) down to a single summary statistic. Simple examples of features include the value of the [autocorrelation function](https://en.wikipedia.org/wiki/Autocorrelation) at lag 1, the coefficient of the linear trend, and the longest period of consecutive values above the mean. [Previous work](https://github.com/benfulcher/hctsa) encoded >7000 time-series features into a comprehensive toolbox, while even more [recent work](https://github.com/hendersontrent/theft) brought a substantial number of these to the free and open-source setting. Time-series features have since been used to answer a 
+Traditional analysis of auditory signals has not typically considered time-series features. Time-series features are properties that reduce an ordered vector of data (i.e., a time series) down to a single summary statistic. Simple examples of features include the value of the [autocorrelation function](https://en.wikipedia.org/wiki/Autocorrelation) at lag 1, the coefficient of the linear trend, and the longest period of consecutive values above the mean. [Previous work](https://github.com/benfulcher/hctsa) encoded >7000 time-series features into a comprehensive toolbox, while even more [recent work](https://github.com/hendersontrent/theft) brought a substantial number of these to the free and open-source setting. Time-series features have since been used across a vast range of scientific applications, such as the classification of stars and classification of fetal heart heart pH.
 
 With regards to guitar VSTs, the following procedure was implemented (a paper is in development which outlines the methodology much more rigorously):
 
 * Set all dials to noon, disable all effects, cabinets, and microphones to isolate the head
-* Pass a 20Hz-20kHz sine sweep through the amplifier to generate an emplitude waveform over time (a time series)
-* Calculate time-series features for each amplifier
+* Pass a 20Hz-20kHz sine sweep through the amplifier to generate an amplitude waveform over time (a time series)
+* Calculate time-series features for each amplifier using the [`catch22`](https://github.com/DynamicsAndNeuralSystems/catch22) feature set, as well as a collection of feature sets which measure some ['basic properties'](https://github.com/hendersontrent/basicproperties) of the time series (including a feature set of 400 [fast Fourier transform](https://en.wikipedia.org/wiki/Fast_Fourier_transform) coefficients  100 coefficients each for the real, imaginary, angle, and absolute components, a feature set of 100 quantiles, moments of the distribution, coefficients of the autocorrelation function, and the linear trend of the time serie.
 * Conduct statistical analysis of feature results
 
 ## Who made it?
 
 This application was developed by [Trent Henderson](https://twitter.com/trentlikesstats) -- a passionate guitarist, Senior Data Scientist for an industry firm (in a field unrelated to music technology), and PhD student in the [Dynamics and Neural Systems Group](https://dynamicsandneuralsystems.github.io) in the School of Physics at The University of Sydney. Please send any questions to Trent via [email](then6675@uni.sydney.edu.au). If you identify an issue with the application itself, or want to contribute, please log an issue or pull request at the [GitHub repository](https://github.com/hendersontrent/amp-comp-webtool/issues). Please also see the [original repository](https://github.com/hendersontrent/amp-sim-comp) for the analytical work which underpins this application.
+
+## Limitations of the application
+
+The current version (v0.1) of this application does not support full hyperparameter adjustment of the dimensionality reduction algorithms. This will hopefully be added in the future. Currently, only features from `catch22` and a collection of small sets of basic properties have been calculated. It is intended that the collection of >1200 features contained in the R software package [`theft`](https://github.com/hendersontrent/theft) will eventually be added.
+
+In the future, it is intended that the application will be able to scale to where users can upload their own amplifier's amplitude waveform from the aforementioned sine sweep to enable immediate comparison to the amplifiers which have already been evaluated. This will turn the application into a growing, living library of guitar VSTs.
+
+## Application version log
+
+* v0.1 -- Initial release (current)

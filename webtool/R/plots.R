@@ -17,12 +17,12 @@
 #' @param cor_method \code{character} specifying the correlation method to use if \code{type = "cor"}. Defaults to \code{"pearson"}
 #' @param feature_names \code{character} vector denoting the name of the features to plot if \code{type = "violin"}. Defaults to \code{NULL}
 #' @param ... Arguments to be passed to \code{ggplot2::geom_bar} if \code{type = "quality"}, \code{ggplot2::geom_raster} if \code{type = "matrix"}, \code{ggplot2::geom_raster} if \code{type = "cor"}, or \code{ggplot2::geom_point} if \code{type = "violin"}
-#' @return object of class \code{ggplot} that contains the graphic
+#' @return object of class \code{ggplotly} that contains the graphic
 #' @author Trent Henderson
 #' 
 
 plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "violin"), 
-                                      norm_method = c("z-score", "Sigmoid", "RobustSigmoid", "MinMax"),
+                                      norm_method = c("zScore", "Sigmoid", "RobustSigmoid", "MinMax"),
                                       unit_int = FALSE,
                                       clust_method = c("average", "ward.D", "ward.D2", "single", "complete", "mcquitty", "median", "centroid"),
                                       cor_method = c("pearson", "spearman"), feature_names = NULL, ...){
@@ -265,6 +265,11 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     }
   }
   
+  # Convert to interactive graphic
+  
+  p <- plotly::ggplotly(p, tooltip = c("text")) %>%
+    config(displayModeBar = FALSE)
+  
   return(p)
 }
 
@@ -285,7 +290,7 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
 #' @param x \code{low_dimension} object containing the dimensionality reduction projection calculated by \code{reduce_dimensions}
 #' @param show_covariance \code{Boolean} of whether covariance ellipses should be shown on the plot. Defaults to \code{TRUE}
 #' @param ... Arguments to be passed to methods
-#' @return object of class \code{ggplot} that contains the graphic
+#' @return object of class \code{ggplotly} that contains the graphic
 #' @author Trent Henderson
 #' 
 
@@ -466,6 +471,9 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
         ggplot2::theme(panel.grid.minor = ggplot2::element_blank())
     }
   }
+  
+  p <- plotly::ggplotly(p, tooltip = c("text")) %>%
+    config(displayModeBar = FALSE)
   
   return(p)
 }
