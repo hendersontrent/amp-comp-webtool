@@ -137,7 +137,10 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     mypalette <- c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC")
     
     p <- cluster_out %>%
-      ggplot2::ggplot(ggplot2::aes(x = .data$names, y = .data$id, fill = .data$value))  +
+      ggplot2::ggplot(ggplot2::aes(x = .data$names, y = .data$id, fill = .data$value,
+                                   text = paste('<b>VST:</b>', amplifier,
+                                                '<br><b>Feature:</b>', names,
+                                                '<br><b>Value:</b>', round(values, digits = 2))))  +
       ggplot2::geom_raster(...) +
       ggplot2::scale_fill_stepsn(n.breaks = 6, colours = rev(mypalette),
                                  show.limits = TRUE) +
@@ -215,7 +218,10 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     mypalette <- c("#B2182B", "#D6604D", "#F4A582", "#FDDBC7", "#D1E5F0", "#92C5DE", "#4393C3", "#2166AC")
     
     p <- cluster_out %>%
-      ggplot2::ggplot(ggplot2::aes(x = .data$Var1, y = .data$Var2)) +
+      ggplot2::ggplot(ggplot2::aes(x = .data$Var1, y = .data$Var2,
+                                   text = paste('<b>VST 1:</b>', Var1,
+                                                '<br><b>VSR 2:</b>', Var2,
+                                                '<br><b>Correlation:</b>', round(value, digits = 2)))) +
       ggplot2::geom_raster(ggplot2::aes(fill = .data$value), ...) +
       ggplot2::labs(title = "Pairwise correlation matrix",
                     x = "Feature",
@@ -348,8 +354,7 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
       if(show_covariance){
         p <- p +
           ggplot2::stat_ellipse(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2, fill = .data$group_id), geom = "polygon", alpha = 0.2) +
-          ggplot2::guides(fill = "none") +
-          ggplot2::scale_fill_brewer(palette = "Dark2")
+          ggplot2::guides(fill = "none")
       }
       
       if(nrow(fits) > 200){
@@ -365,7 +370,6 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
                       x = paste0("PC 1"," (", eigen_pc1, ")"),
                       y = paste0("PC 2"," (", eigen_pc2, ")"),
                       colour = NULL) +
-        ggplot2::scale_colour_brewer(palette = "Dark2") +
         ggplot2::theme_bw() +
         ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
                        legend.position = "bottom")
@@ -428,8 +432,7 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
       if(show_covariance){
         p <- p +
           ggplot2::stat_ellipse(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2, fill = .data$group_id), geom = "polygon", alpha = 0.2) +
-          ggplot2::guides(fill = "none") +
-          ggplot2::scale_fill_brewer(palette = "Dark2")
+          ggplot2::guides(fill = "none")
       }
       
       if(nrow(fits) > 200){
@@ -445,7 +448,6 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
                       x = "Dimension 1",
                       y = "Dimension 2",
                       colour = NULL) +
-        ggplot2::scale_colour_brewer(palette = "Dark2") +
         ggplot2::theme_bw() +
         ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
                        legend.position = "bottom")
