@@ -190,7 +190,9 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     cor_dat <- data_id %>%
       dplyr::filter(.data$id %in% ids_to_keep) %>%
       tidyr::pivot_wider(id_cols = "id", names_from = "names", values_from = "values") %>%
-      dplyr::select(-c(.data$id))
+      dplyr::select(-c(.data$id)) %>%
+      dplyr::select_if(~sum(!is.na(.)) > 0) %>%
+      dplyr::select(where(~dplyr::n_distinct(.) > 1)) # Delete features that are all NaNs and features with constant values
     
     #--------- Correlation ----------
     
@@ -231,15 +233,9 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
                                  show.limits = TRUE) +
       ggplot2::theme_bw() +
       ggplot2::theme(panel.grid = ggplot2::element_blank(),
-                     legend.position = "bottom")
-    
-    if(ncol(cor_dat) <= 20){
-      p <- p +
+                     legend.position = "bottom") +
         ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
-    } else {
-      p <- p +
-        ggplot2::theme(axis.text = ggplot2::element_blank())
-    }
+    
   } else{
     
     if(is.null(feature_names)){
@@ -331,69 +327,34 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
       dplyr::rename(.fitted1 = .data$.fittedPC1,
                     .fitted2 = .data$.fittedPC2)
     
-    if("group" %in% colnames(x[[1]])){
-      
-      data_id <- as.data.frame(lapply(x[[1]], unlist)) # Catch weird cases where it's a list...
-      
-      groups <- data_id %>%
-        dplyr::rename(group_id = .data$group) %>%
-        dplyr::group_by(.data$id, .data$group_id) %>%
-        dplyr::summarise(counter = dplyr::n()) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(-c(.data$counter)) %>%
-        dplyr::mutate(id = as.factor(.data$id))
-      
-      fits <- fits %>%
-        dplyr::inner_join(groups, by = c("id" = "id"))
-      
-      # Draw plot
-      
-      p <- fits %>%
-        dplyr::mutate(group_id = as.factor(.data$group_id)) %>%
-        ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2))
-      
-      if(show_covariance){
-        p <- p +
-          ggplot2::stat_ellipse(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2, fill = .data$group_id), geom = "polygon", alpha = 0.2) +
-          ggplot2::guides(fill = "none")
-      }
-      
-      if(nrow(fits) > 200){
-        p <- p +
-          ggplot2::geom_point(size = 1.5, ggplot2::aes(colour = .data$group_id))
-      } else{
-        p <- p +
-          ggplot2::geom_point(size = 2.25, ggplot2::aes(colour = .data$group_id))
-      }
-      
-      p <- p +
-        ggplot2::labs(title = "Low dimensional projection of time series",
-                      x = paste0("PC 1"," (", eigen_pc1, ")"),
-                      y = paste0("PC 2"," (", eigen_pc2, ")"),
-                      colour = NULL) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                       legend.position = "bottom")
-    } else{
-      
-      p <- fits %>%
-        ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2))
-      
-      if(nrow(fits) > 200){
-        p <- p +
-          ggplot2::geom_point(size = 1.5, colour = "black")
-      } else{
-        p <- p +
-          ggplot2::geom_point(size = 2, colour = "black")
-      }
-      
-      p <- p +
-        ggplot2::labs(title = "Low dimensional projection of time series",
-                      x = paste0("PC 1"," (", eigen_pc1, ")"),
-                      y = paste0("PC 2"," (", eigen_pc2, ")")) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(panel.grid.minor = ggplot2::element_blank())
-    }
+    data_id <- as.data.frame(lapply(x[[1]], unlist)) # Catch weird cases where it's a list...
+    
+    groups <- data_id %>%
+      dplyr::rename(group_id = .data$plugin) %>%
+      dplyr::group_by(.data$id, .data$group_id) %>%
+      dplyr::summarise(counter = dplyr::n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-c(.data$counter)) %>%
+      dplyr::mutate(id = as.factor(.data$id))
+    
+    fits <- fits %>%
+      dplyr::inner_join(groups, by = c("id" = "id"))
+    
+    # Draw plot
+    
+    p <- fits %>%
+      dplyr::mutate(group_id = as.factor(.data$group_id)) %>%
+      ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2,
+                                   text = paste('<b>VST:</b>', id,
+                                                '<br><b>Plugin:</b>', group_id))) +
+      ggplot2::geom_point(size = 1.5, ggplot2::aes(colour = .data$group_id)) +
+      ggplot2::labs(x = paste0("PC 1"," (", eigen_pc1, ")"),
+                    y = paste0("PC 2"," (", eigen_pc2, ")"),
+                    colour = NULL) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                     legend.position = "none")
+    
   } else{
     
     # Retrieve 2-dimensional embedding and add in unique IDs
@@ -409,75 +370,35 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
     fits <- fits %>%
       dplyr::mutate(id = as.factor(.data$id))
     
-    if("group" %in% colnames(x[[1]])){
-      
-      data_id <- as.data.frame(lapply(x[[1]], unlist)) # Catch weird cases where it's a list...
-      
-      groups <- data_id %>%
-        dplyr::rename(group_id = .data$group) %>%
-        dplyr::group_by(.data$id, .data$group_id) %>%
-        dplyr::summarise(counter = dplyr::n()) %>%
-        dplyr::ungroup() %>%
-        dplyr::select(-c(.data$counter)) %>%
-        dplyr::mutate(id = as.factor(.data$id))
-      
-      fits <- fits %>%
-        dplyr::inner_join(groups, by = c("id" = "id"))
-      
-      # Draw plot
-      
-      p <- fits %>%
-        dplyr::mutate(group_id = as.factor(.data$group_id)) %>%
-        ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2))
-      
-      if(show_covariance){
-        p <- p +
-          ggplot2::stat_ellipse(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2, fill = .data$group_id), geom = "polygon", alpha = 0.2) +
-          ggplot2::guides(fill = "none")
-      }
-      
-      if(nrow(fits) > 200){
-        p <- p +
-          ggplot2::geom_point(size = 1.5, ggplot2::aes(colour = .data$group_id))
-      } else{
-        p <- p +
-          ggplot2::geom_point(size = 2.25, ggplot2::aes(colour = .data$group_id))
-      }
-      
-      p <- p +
-        ggplot2::labs(title = "Low dimensional projection of time series",
-                      x = "Dimension 1",
-                      y = "Dimension 2",
-                      colour = NULL) +
-        ggplot2::theme_bw() +
-        ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                       legend.position = "bottom")
-      
-    } else{
-      
-      p <- fits %>%
-        ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2))
-      
-      if(nrow(fits) > 200){
-        p <- p +
-          ggplot2::geom_point(size = 1.5, colour = "black")
-      } else{
-        p <- p +
-          ggplot2::geom_point(size = 2, colour = "black")
-      }
-      
-      p <- p +
-        ggplot2::labs(title = "Low dimensional projection of time series",
-                      x = "Dimension 1",
-                      y = "Dimension 2") +
-        ggplot2::theme_bw() +
-        ggplot2::theme(panel.grid.minor = ggplot2::element_blank())
-    }
+    data_id <- as.data.frame(lapply(x[[1]], unlist)) # Catch weird cases where it's a list...
+    
+    groups <- data_id %>%
+      dplyr::rename(group_id = .data$plugin) %>%
+      dplyr::group_by(.data$id, .data$group_id) %>%
+      dplyr::summarise(counter = dplyr::n()) %>%
+      dplyr::ungroup() %>%
+      dplyr::select(-c(.data$counter)) %>%
+      dplyr::mutate(id = as.factor(.data$id))
+    
+    fits <- fits %>%
+      dplyr::inner_join(groups, by = c("id" = "id"))
+    
+    p <- fits %>%
+      dplyr::mutate(group_id = as.factor(.data$group_id)) %>%
+      ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2,
+                                   text = paste('<b>VST:</b>', id,
+                                                '<br><b>Plugin:</b>', group_id))) +
+      ggplot2::geom_point(size = 1.5, ggplot2::aes(colour = .data$group_id)) +
+      ggplot2::labs(x = "Dimension 1",
+                    y = "Dimension 2",
+                    colour = NULL) +
+      ggplot2::theme_bw() +
+      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
+                     legend.position = "none")
   }
   
   p <- plotly::ggplotly(p, tooltip = c("text")) %>%
-    config(displayModeBar = FALSE) %>%
-    layout(legend = list(orientation = "h", x = 0.4, y = -0.2))
+    config(displayModeBar = FALSE)
   
   return(p)
 }

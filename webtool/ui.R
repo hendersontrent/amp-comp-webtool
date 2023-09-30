@@ -28,7 +28,7 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                                             selected = amplifiers, options = list(`actions-box` = TRUE), multiple = TRUE),
                                 
                                 conditionalPanel(
-                                  condition = "input.low_dim_norm == 'tSNE'",
+                                  condition = "input.low_dim_method == 'tSNE'",
                                   sliderInput("low_dim_perplexity", "Perplexity hyperparameter",
                                               min = 2, max = 100, value = 10),
                                 )
