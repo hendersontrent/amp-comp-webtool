@@ -21,6 +21,7 @@ library(broom)
 library(Rtsne)
 library(MASS)
 library(umap)
+library(reshape2)
 
 # Load in any HTML imports
 
@@ -47,9 +48,9 @@ for(f in r_files){
 
 # Define tab names
 
-navtab0 <- "LOW DIMENSIONAL PROJECTION"
-navtab1 <- "DATA MATRIX"
-navtab2 <- "PAIRWISE CORRELATIONS"
+navtab0 <- "PAIRWISE CORRELATIONS"
+navtab1 <- "LOW DIMENSIONAL PROJECTION"
+navtab2 <- "DATA MATRIX"
 navtab3 <- "ABOUT"
 
 # Turn off scientific notation

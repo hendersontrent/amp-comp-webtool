@@ -34,6 +34,25 @@ shinyServer <- function(input, output, session) {
     return(p)
   })
   
+  #------------ Pairwise correlations -----------
+  
+  output$pw_corrs <- renderPlotly({
+    
+    feat_mat2 <- feat_mat %>%
+      filter(id %in% input$pw_corrs_amps)
+    
+    feat_mat2 <- structure(list(feat_mat2), class = "feature_calculations") # For consistency with {theft}
+    
+    # Draw plot
+    
+    p <- plot(feat_mat2, 
+              type = "cor",
+              clust_method = input$pw_corrs_cluster,
+              cor_method = input$pw_corrs_cor)
+    
+    return(p)
+  })
+  
   #------------ Data matrix -----------
   
   output$data_matrix <- renderPlotly({
@@ -50,27 +69,6 @@ shinyServer <- function(input, output, session) {
               norm_method = input$data_matrix_norm,
               unit_int = input$data_matrix_unit,
               clust_method = input$data_matrix_cluster)
-    
-    return(p)
-  })
-  
-  #------------ Pairwise correlations -----------
-  
-  output$pw_corrs <- renderPlotly({
-    
-    feat_mat2 <- feat_mat %>%
-      filter(id %in% input$pw_corrs_amps)
-    
-    feat_mat2 <- structure(list(feat_mat2), class = "feature_calculations") # For consistency with {theft}
-    
-    # Draw plot
-    
-    p <- plot(feat_mat2, 
-              type = "cor",
-              norm_method = input$pw_corrs_norm,
-              unit_int = input$pw_corrs_unit,
-              clust_method = input$pw_corrs_cluster,
-              cor_method = input$pw_corrs_cor)
     
     return(p)
   })

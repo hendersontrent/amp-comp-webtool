@@ -76,8 +76,7 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     p <- tmp %>%
       ggplot2::ggplot(ggplot2::aes(x = stats::reorder(.data$names, -.data$ranker), y = .data$props)) +
       ggplot2::geom_bar(stat = "identity", ggplot2::aes(fill = .data$quality), ...) +
-      ggplot2::labs(title = "Data quality for computed features",
-                    x = "Feature",
+      ggplot2::labs(x = "Feature",
                     y = "Proportion of Outputs",
                     fill = "Data Type") +
       ggplot2::scale_y_continuous(limits = c(0,1),
@@ -138,59 +137,33 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     
     p <- cluster_out %>%
       ggplot2::ggplot(ggplot2::aes(x = .data$names, y = .data$id, fill = .data$value,
-                                   text = paste('<b>VST:</b>', id,
+                                   text = paste('<b>VST head:</b>', id,
                                                 '<br><b>Feature:</b>', names,
                                                 '<br><b>Value:</b>', round(value, digits = 2))))  +
       ggplot2::geom_raster(...) +
       ggplot2::scale_fill_stepsn(n.breaks = 6, colours = rev(mypalette),
                                  show.limits = TRUE) +
-      ggplot2::labs(title = "Data matrix",
-                    x = "Feature",
-                    y = "Time series") +
+      ggplot2::labs(x = "Feature",
+                    y = "VST head",
+                    fill = "Scaled value") +
       ggplot2::theme_bw() + 
-      ggplot2::theme(axis.text.y = ggplot2::element_blank(),
-                     panel.grid = ggplot2::element_blank()) +
-      ggplot2::labs(fill = "Scaled value")
-    
-    if(length(unique(cluster_out$names)) <= 22){
-      p <- p +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1),
-                       axis.ticks.y = ggplot2::element_blank())
-    } else {
-      p <- p +
-        ggplot2::theme(axis.text = ggplot2::element_blank(),
-                       axis.ticks = ggplot2::element_blank())
-    }
-    
-    p <- p +
-      ggplot2::theme(legend.position = "bottom")
+      ggplot2::theme(axis.text.x = ggplot2::element_blank(),
+                     legend.position = "bottom",
+                     panel.background = ggplot2::element_rect(fill = 'transparent'),
+                     plot.background = ggplot2::element_rect(fill = 'transparent', color = NA),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.background = ggplot2::element_rect(fill = 'transparent'),
+                     legend.box.background = ggplot2::element_rect(fill = 'transparent'))
     
   } else if(type == "cor") {
     
     #------------- Clean up structure --------------
     
     data_id <- x[[1]] %>%
-      dplyr::select(c(.data$id, .data$names, .data$values, .data$feature_set)) %>%
-      tidyr::drop_na() %>%
-      dplyr::mutate(names = paste0(.data$feature_set, "_", .data$names)) %>% # Catches errors when using all features across sets (i.e., there's duplicates)
-      dplyr::select(-c(.data$feature_set))
-    
-    #------------- Data reshaping -------------------
-    
-    features <- unique(data_id$names)
-    
-    ids_to_keep <- data_id %>%
-      dplyr::group_by(.data$id) %>%
-      dplyr::summarise(counter = dplyr::n()) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(.data$counter == length(features))
-    
-    ids_to_keep <- ids_to_keep$id
-    
-    cor_dat <- data_id %>%
-      dplyr::filter(.data$id %in% ids_to_keep) %>%
-      tidyr::pivot_wider(id_cols = "id", names_from = "names", values_from = "values") %>%
-      dplyr::select(-c(.data$id)) %>%
+      dplyr::select(c(.data$id, .data$names, .data$values)) %>%
+      tidyr::drop_na() %>% 
+      tidyr::pivot_wider(id_cols = "names", names_from = "id", values_from = "values") %>%
+      dplyr::select(-c(.data$names)) %>%
       dplyr::select_if(~sum(!is.na(.)) > 0) %>%
       dplyr::select(where(~dplyr::n_distinct(.) > 1)) # Delete features that are all NaNs and features with constant values
     
@@ -198,7 +171,7 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     
     # Calculate correlations and take absolute
     
-    result <- abs(stats::cor(cor_dat, method = cor_method))
+    result <- abs(stats::cor(data_id, method = cor_method))
     
     #--------- Clustering -----------
     
@@ -222,19 +195,22 @@ plot.feature_calculations <- function(x, type = c("quality", "matrix", "cor", "v
     p <- cluster_out %>%
       ggplot2::ggplot(ggplot2::aes(x = .data$Var1, y = .data$Var2,
                                    text = paste('<b>VST 1:</b>', Var1,
-                                                '<br><b>VSR 2:</b>', Var2,
+                                                '<br><b>VST 2:</b>', Var2,
                                                 '<br><b>Correlation:</b>', round(value, digits = 2)))) +
       ggplot2::geom_raster(ggplot2::aes(fill = .data$value), ...) +
-      ggplot2::labs(title = "Pairwise correlation matrix",
-                    x = "Feature",
-                    y = "Feature",
+      ggplot2::labs(x = "VST head",
+                    y = "VST head",
                     fill = "Absolute correlation coefficient") +
       ggplot2::scale_fill_stepsn(n.breaks = 6, colours = rev(mypalette),
                                  show.limits = TRUE) +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid = ggplot2::element_blank(),
-                     legend.position = "bottom") +
-        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90),
+                     legend.position = "bottom",
+                     panel.background = ggplot2::element_rect(fill = 'transparent'),
+                     plot.background = ggplot2::element_rect(fill = 'transparent', color = NA),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.background = ggplot2::element_rect(fill = 'transparent'),
+                     legend.box.background = ggplot2::element_rect(fill = 'transparent'))
     
   } else{
     
@@ -345,15 +321,19 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
     p <- fits %>%
       dplyr::mutate(group_id = as.factor(.data$group_id)) %>%
       ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2,
-                                   text = paste('<b>VST:</b>', id,
+                                   text = paste('<b>VST head:</b>', id,
                                                 '<br><b>Plugin:</b>', group_id))) +
-      ggplot2::geom_point(size = 1.5, ggplot2::aes(colour = .data$group_id)) +
+      ggplot2::geom_point(size = 2, ggplot2::aes(colour = .data$group_id)) +
       ggplot2::labs(x = paste0("PC 1"," (", eigen_pc1, ")"),
                     y = paste0("PC 2"," (", eigen_pc2, ")"),
                     colour = NULL) +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                     legend.position = "none")
+      ggplot2::theme(legend.position = "none",
+                     panel.background = ggplot2::element_rect(fill = 'transparent'),
+                     plot.background = ggplot2::element_rect(fill = 'transparent', color = NA),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.background = ggplot2::element_rect(fill = 'transparent'),
+                     legend.box.background = ggplot2::element_rect(fill = 'transparent'))
     
   } else{
     
@@ -386,15 +366,19 @@ plot.low_dimension <- function(x, show_covariance = TRUE, ...){
     p <- fits %>%
       dplyr::mutate(group_id = as.factor(.data$group_id)) %>%
       ggplot2::ggplot(ggplot2::aes(x = .data$.fitted1, y = .data$.fitted2,
-                                   text = paste('<b>VST:</b>', id,
+                                   text = paste('<b>VST head:</b>', id,
                                                 '<br><b>Plugin:</b>', group_id))) +
-      ggplot2::geom_point(size = 1.5, ggplot2::aes(colour = .data$group_id)) +
+      ggplot2::geom_point(size = 2, ggplot2::aes(colour = .data$group_id)) +
       ggplot2::labs(x = "Dimension 1",
                     y = "Dimension 2",
                     colour = NULL) +
       ggplot2::theme_bw() +
-      ggplot2::theme(panel.grid.minor = ggplot2::element_blank(),
-                     legend.position = "none")
+      ggplot2::theme(legend.position = "none",
+                     panel.background = ggplot2::element_rect(fill = 'transparent'),
+                     plot.background = ggplot2::element_rect(fill = 'transparent', color = NA),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.background = ggplot2::element_rect(fill = 'transparent'),
+                     legend.box.background = ggplot2::element_rect(fill = 'transparent'))
   }
   
   p <- plotly::ggplotly(p, tooltip = c("text")) %>%
