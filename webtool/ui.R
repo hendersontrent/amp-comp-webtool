@@ -17,7 +17,7 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                             sidebarLayout(
                               sidebarPanel(
                                 h1("Low dimensional projection control"),
-                                p("This page XXXX"),
+                                p("This page presents a graphical summary of how different VST heads are related to each other based on their time-series feature values, but in a two-dimensional space (instead of the 542-dimensional space of all calculated features). This makes visualisation as a scatterplot in terms of the two most important dimensions a useful tool for obtaining an understanding about the VSTs."),
                                 radioButtons("low_dim_norm", "What rescaling/normalisation method would you like to use?",
                                              choices = rescalers, selected = rescalers[1], inline = FALSE),
                                 radioButtons("low_dim_unit", "Would you like to rescale to the unit interval after applying the above method?",
@@ -47,7 +47,7 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                             sidebarLayout(
                               sidebarPanel(
                                 h1("Data matrix visualisation control"),
-                                p("This page XXXX"),
+                                p("This page visualises the time series x feature matrix calculated for the set of VST heads. This visualisation is useful as it can pull out empirical structure from data to assist in the ability to derive inferences regarding how the amplitude waveforms for each VST head might be similar or not."),
                                 radioButtons("data_matrix_norm", "What rescaling/normalisation method would you like to use?",
                                              choices = rescalers, selected = rescalers[1], inline = FALSE),
                                 radioButtons("data_matrix_unit", "Would you like to rescale to the unit interval after applying the above method?",
@@ -71,7 +71,7 @@ shinyUI(navbarPage(theme = "corp-styles.css",
                             sidebarLayout(
                               sidebarPanel(
                                 h1("Pairwise correlation matrix control"),
-                                p("This page XXXX"),
+                                p("This page visualises pairwise correlations between the VST heads based on their feature vectors rather than the raw time-domain space (which in the case of a 20Hz-20kHz sine sweep is very large).."),
                                 radioButtons("pw_corrs_norm", "What rescaling/normalisation method would you like to use?",
                                              choices = rescalers, selected = rescalers[1], inline = FALSE),
                                 radioButtons("pw_corrs_unit", "Would you like to rescale to the unit interval after applying the above method?",
